@@ -52,14 +52,14 @@ public class KernelSearch
 	
 	public Solution start()
 	{
-		startTime = Instant.now();
-		callback = new CustomCallback(logPath, startTime);
 		items = buildItems();
 		sorter.sort(items);	
 		kernel = kernelBuilder.build(items, config);
-		buckets = bucketBuilder.build(items.stream().filter(it -> !kernel.contains(it)).collect(Collectors.toList()), config);
 		solveKernel();
+		//TODO CREARE FILTER PER GLI ITEMS DEI BUCKET
+		buckets = bucketBuilder.build(items.stream().filter(it -> !kernel.contains(it)).collect(Collectors.toList()), config);
 		iterateBuckets();
+		PrintItems.print(kernel, buckets, logPath);
 		
 		return bestSolution;
 	}
@@ -68,17 +68,28 @@ public class KernelSearch
 	{
 		Model model = new Model(instPath, logPath, config.getTimeLimit(), config, true); // time limit equal to the global time limit
 		model.buildModel();
+		List<Item> items = readItems(instPath);
+		
+		//TODO LEGGERE GLI ITEMS CON PESO E VALORE E I NODI VICINI
+		startTime = Instant.now();
+		callback = new CustomCallback(logPath, startTime);
 		model.solve();
-		List<Item> items = new ArrayList<>();
 		List<String> varNames = model.getVarNames();
-		for(String v : varNames)
-		{
-			double value = model.getVarValue(v);
-			double rc = model.getVarRC(v); // can be called only after solving the LP relaxation
-			Item it = new Item(v, value, rc);
-			items.add(it);
+		//TODO AGGIORNARE GLI ITEMS CON Xr E Rc
+		
+		for(Item item: items) {
+			item.setXr(model.getVarValue(item.getName()));
+			item.setRc(model.getVarRC(item.getName()));			
 		}
+		
 		return items;
+	}
+	
+	private List<Item> readItems(String instPath) {
+		ArrayList<Item> ritorno = new ArrayList<Item>(); 
+		ReadItems ri = new ReadItems();
+		ritorno.addAll(ri.read(instPath));
+		return ritorno;
 	}
 	
 	private void solveKernel()
@@ -86,7 +97,6 @@ public class KernelSearch
 		Model model = new Model(instPath, logPath, Math.min(tlimKernel, getRemainingTime()), config, false);	
 		model.buildModel();
 		objValues.add(new ArrayList<>());
-		
 		
 		if(!bestSolution.isEmpty())
 		{
@@ -109,6 +119,10 @@ public class KernelSearch
 		{
 			objValues.get(objValues.size()-1).add(0.0);
 		}
+		/*
+		 * TODO DA BEST SOLUTION RICAVARE TUTTE GLI ITEM SELEZIONATI E RIMUOVERE
+		 * I VICINI COSÌ DA NON FARLI ENTRARE NEI BUCKET
+		 */
 	}
 	
 	private void iterateBuckets()

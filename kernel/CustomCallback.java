@@ -22,7 +22,7 @@ public class CustomCallback extends GRBCallback
 		bestObj = GRB.INFINITY;
 		try
 		{
-			this.log = new PrintStream(new BufferedOutputStream(new FileOutputStream(this.path + "\\" + "log_best_solutions.txt")), true);
+			this.log = new PrintStream(new BufferedOutputStream(new FileOutputStream(this.path + "log_best_solutions.txt")), true);
 		} catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
@@ -41,7 +41,9 @@ public class CustomCallback extends GRBCallback
 				{
 					bestObj = obj;
 					long time = Duration.between(startTime, Instant.now()).getNano()/1000000;
-					log.println("OBJ:" + obj + "  -  TIME: " + time + " ms.");					
+					long seconds = Duration.between(startTime, Instant.now()).getSeconds();
+					time = seconds*1000+time;
+					log.println("OBJ: " + obj + " - TIME: " + time + " ms.");			
 				}
 			}
 		} catch (GRBException e)

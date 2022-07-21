@@ -1,6 +1,7 @@
 package kernel;
 public class Configuration
 {
+
 	private int numThreads;
 	private double mipGap;
 	private int presolve;
@@ -8,11 +9,49 @@ public class Configuration
 	private ItemSorter sorter;
 	private double kernelSize;
 	private double bucketSize;
+	private int bucketNumber=1;
+	//TODO AGGIUNGERE CLASSE FILTER ITEMS;
 	private BucketBuilder bucketBuilder;
 	private KernelBuilder kernelBuilder;
 	private int timeLimitKernel;
 	private int numIterations;
 	private int timeLimitBucket;
+	
+	public int getBucketNumber() {
+		return bucketNumber;
+	}
+
+	public String getName() {
+		String name ="";
+		if(sorter.getClass().equals(ItemSorterByValueAndAbsoluteRC.class)) {
+			name += 0 + "_";
+		}
+		else if(sorter.getClass().equals(ItemSorterVW.class)) {
+			name += 1 + "_";
+		}
+		if(kernelBuilder.getClass().equals(KernelBuilderPositive.class)) {
+			name += 0 +"_";
+		}
+		else if(kernelBuilder.getClass().equals(KernelBuilderPercentage.class)) {
+			name += 1 +"_";
+		}
+		
+		name += kernelSize+"_";
+		
+		if(bucketBuilder.getClass().equals(DefaultBucketBuilder.class)) {
+			name += 0+"_";
+		}
+		else if(bucketBuilder.getClass().equals(NumericBucketBuilder.class)) {
+			name += 1+"_";
+		}
+		else if(bucketBuilder.getClass().equals(NoBucketBuilder.class)) {
+			name += 2+"_";
+		}
+		
+		name += bucketSize;
+		
+		return name;
+	}
 
 	public BucketBuilder getBucketBuilder()
 	{
@@ -127,6 +166,10 @@ public class Configuration
 	public void setTimeLimitBucket(int timeLimitBucket)
 	{
 		this.timeLimitBucket = timeLimitBucket;
+	}
+	
+	public void setBucketNumber(int bucketNumber) {
+		this.bucketNumber = bucketNumber;
 	}
 
 	public void setTimeLimitKernel(int timeLimitKernel)

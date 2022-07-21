@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class ConfigurationReader
 {
-	public static Configuration read(String path)
+	public static Configuration read(String path, int indexConfiguration)
 	{
 		Configuration config = new Configuration();
 		
@@ -42,30 +42,42 @@ public class ConfigurationReader
         			config.setTimeLimit(Integer.parseInt(splitLine[1]));
         			break;
         		case "SORTER":
-        			switch(Integer.parseInt(splitLine[1]))
+        			switch(Integer.parseInt(splitLine[indexConfiguration]))
         			{
         				case 0:
         					config.setItemSorter(new ItemSorterByValueAndAbsoluteRC());
+        					break;
+        				case 1:
+        					config.setItemSorter(new ItemSorterVW());
         					break;
         				default:
         					System.out.println("Unrecognized item sorter.");
         			}
         			break;
         		case "KERNELSIZE":
-        			config.setKernelSize(Double.parseDouble(splitLine[1]));
+        			config.setKernelSize(Double.parseDouble(splitLine[indexConfiguration]));
         			break;
         		case "BUCKETSIZE":
-        			config.setBucketSize(Double.parseDouble(splitLine[1]));
+        			config.setBucketSize(Double.parseDouble(splitLine[indexConfiguration]));
         			break;
         		case "BUCKETBUILDER":
-        			switch(Integer.parseInt(splitLine[1]))
+        			switch(Integer.parseInt(splitLine[indexConfiguration]))
         			{
         				case 0:
         					config.setBucketBuilder(new DefaultBucketBuilder());
         					break;
+        				case 1:
+        					config.setBucketBuilder(new NumericBucketBuilder());
+        					break;
+        				case 2:
+        					config.setBucketBuilder(new NoBucketBuilder());
+        					break;
         				default:
         					System.out.println("Unrecognized bucket builder.");
         			}
+        			break;
+        		case "BUCKETNUMBER":
+        			config.setBucketNumber(Integer.parseInt(splitLine[indexConfiguration]));
         			break;
         		case "TIMELIMITKERNEL":
         			config.setTimeLimitKernel(Integer.parseInt(splitLine[1]));
@@ -77,7 +89,7 @@ public class ConfigurationReader
         			config.setTimeLimitBucket(Integer.parseInt(splitLine[1]));
         			break;
         		case "KERNELBUILDER":
-        			switch(Integer.parseInt(splitLine[1]))
+        			switch(Integer.parseInt(splitLine[indexConfiguration]))
         			{
         				case 0:
         					config.setKernelBuilder(new KernelBuilderPositive());

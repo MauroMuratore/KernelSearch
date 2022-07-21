@@ -1,4 +1,7 @@
 package kernel;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +56,8 @@ public class Model
 	
 	private void setParameters() throws GRBException
 	{
-		env.set(GRB.StringParam.LogFile, logPath+"log.txt");
+		env.set(GRB.StringParam.LogFile, "");
+		//env.set(GRB.IntParam.OutputFlag, 0);
 		env.set(GRB.IntParam.Threads, config.getNumThreads());
 		env.set(GRB.IntParam.Presolve, config.getPresolve());
 		env.set(GRB.DoubleParam.MIPGap, config.getMipGap());
@@ -69,7 +73,6 @@ public class Model
 	{
 		try
 		{
-			
 			model.optimize();
 			if(model.get(IntAttr.SolCount) > 0)
 				hasSolution = true;
@@ -142,11 +145,22 @@ public class Model
 	
 	public void exportSolution(String path)
 	{
+		path = path + "best_solution.sol";
 		try
 		{
-			model.write(path + "bestSolution.sol");
-		} catch (GRBException e)
-		{
+			BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+
+			for(GRBVar var: model.getVars()) {
+				if(var.get(GRB.DoubleAttr.X)>0) {
+					bw.append(var.get(GRB.StringAttr.VarName) + " " + var.get(GRB.DoubleAttr.X));
+					bw.newLine();
+				}
+			}
+			
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (GRBException e) {
 			e.printStackTrace();
 		}
 	}
@@ -231,11 +245,13 @@ public class Model
 	
 	public List<Item> getSelectedItems(List<Item> items)
 	{
+		//TODO DA QUESTO OTTENGO GLI ITEM SELEZIONATI
 		List<Item> selected = new ArrayList<>();
 		for(Item it : items)
 		{
 			try
 			{
+				//TODO DA QUI SI PUÒ MODIFICARE IL VALORE PER CUI SONO SELEZIONATI GLI ITEM
 				if(model.getVarByName(it.getName()).get(DoubleAttr.X)> positiveThreshold)
 					selected.add(it);
 			} catch (GRBException e)

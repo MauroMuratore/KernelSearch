@@ -10,7 +10,7 @@ public class Start
 		String pathmps = args[0];
 		String pathlog = args[1];
 		String pathConfig = args[2];
-		Configuration config = ConfigurationReader.read(pathConfig);		
+		Configuration config = ConfigurationReader.read(pathConfig, 1);		
 		KernelSearch ks = new KernelSearch(pathmps, pathlog, config);
 		ks.start();
 		
